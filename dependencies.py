@@ -159,14 +159,14 @@ def printComplications ( addons ):
         if "uses" in addons [ name ]:
             if "mandatoryMissing" in addons [name]["uses"]:
                 if 0 < len ( addons [name]["uses"]["mandatoryMissing"] ):
-                    print ( "■ ", addons[name]["Title"], ": ", ", ".join( addons [name]["uses"]["mandatoryMissing"] ) )
+                    print ( "* ", addons[name]["Title"], ": ", ", ".join( addons [name]["uses"]["mandatoryMissing"] ) )
     print()
     print ("Unsatisfied optional  dependencies:")
     for name in addons:                        
         if "uses" in addons [ name ]:
             if "optionalMissing" in addons [name]["uses"]:
                 if 0 < len ( addons [name]["uses"]["optionalMissing"] ):
-                    print ( "■ ", addons[name]["Title"], ": ", ", ".join( addons [name]["uses"]["optionalMissing"] ) )
+                    print ( "* ", addons[name]["Title"], ": ", ", ".join( addons [name]["uses"]["optionalMissing"] ) )
     print()
     print ("assumed libraries not used by any other addon:")
     for name in addons:                        
@@ -180,7 +180,7 @@ def printComplications ( addons ):
                     if 0 < len ( addons [name]["usedBy"]["optional"] ):
                         used = True
             if not used:
-                print ( "■ ", addons[name]["Title"] )
+                print ( "* ", addons[name]["Title"] )
     print ("[please be aware that addons starting with 'lib' are detected as library, even if they might not be a library]")
     print()
     
