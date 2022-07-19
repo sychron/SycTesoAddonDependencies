@@ -1,7 +1,7 @@
 # SycTesoAddonDependencies
 Pytrhon script to check dependencies of addons for Elder Scrolls Online
 
-usage: 
+USAGE
 
 put the python script in a folder inside your Documents/Elder Scrolls Online folder, next to the live folder used by ESO.
 
@@ -21,17 +21,19 @@ Please note that there is a "isLibrary" tag in the description files, but this i
 
 After running the script, you can use the compiled information to install needed dependencies, uninstall unused libraries etc.
 
+COMPATIBILITY
 
+This code was written and testes on Windows. I used python functions for all OS relevant differences, such as path processing, so the code should run on other operating systems as well. You might have to change the addon search path in the first lines of the script.
 
 TODO
 
 * add support for version checking. Version dependencies are recognized and listed, but versions are not checked when generating the output
 * add support for nested dependencies, f.e. dependencies having dependencies as well. This will only work with addons installed, as this script is not intended to pull addon descriptions from any server.
 
-
-Any Ideas?
+IDEAS?
 
 If this script is useful to you and/or you have any suggestion, please leave a comment or feel free to contribute.
 
 I know this is not the prettiest python code, but I decided to upload it now instead of having it sit on my disk for months waiting to be made pretty for release.
 
+The code is modular, so I hope you can easily navigate it and modify functions or just copy functions you might find useful for your own projects. This script is MIT licensed, so feel free :)
