@@ -64,7 +64,8 @@ def is_library ( addon_data ):
     if name.startswith ( "lib" ):
         result = True
     if result:
-        log ( 3, f"{addon_data [ "name" ]} is a library" )
+        name = addon_data [ "name" ]
+        log ( 3, f"{name} is a library" )
     return result
 
 def read_addon_info_files ( description_files ):
@@ -91,8 +92,8 @@ def parse_dependency_string ( dep_string ):
     """Interpret a  list of dependencies including version information and return a dict."""
     dependency_info = {}
     dependencies = dep_string.split(" ")
-    for dependency in dependencies:        
-        data = dependency.split(">=") if ">=" in dependency else dependency.split("<=")        
+    for dependency in dependencies:
+        data = dependency.split(">=") if ">=" in dependency else dependency.split("<=")
         dependency_info [ dependency ] = {
             "name": data[0],
             "greater_than": data[1] if ">=" in dependency else "",
@@ -206,11 +207,12 @@ def print_complications ( addons ):
     print()
 
 def main():
+    """Check dependencies in ESO addon folder."""
     file_list = find_valid_addon_description_files ( ADDON_ROOT )
-    addonInfo = read_addon_info_files ( file_list )
-    build_dependency_matrix ( addonInfo )
-    print_dependency_matrix ( addonInfo )
-    print_complications ( addonInfo )
+    addon_info = read_addon_info_files ( file_list )
+    build_dependency_matrix ( addon_info )
+    print_dependency_matrix ( addon_info )
+    print_complications ( addon_info )
 
 if __name__ == "__main__":
     main()
