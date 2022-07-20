@@ -5,12 +5,12 @@
     run with python 3.
     takes no parameters and prints it output to the command line
     """
-import os.path
-from os.path import exists
+from os import listdir
+from os.path import exists, join
 from pathlib import Path
 
 VERBOSITY = 2
-ADDON_ROOT = os.path.join ( "..", "live", "Addons" )
+ADDON_ROOT = join ( "..", "live", "Addons" )
 DATA_DESIGNATOR = "## "
 
 def log ( level, text, linebreak  = True ):
@@ -25,8 +25,8 @@ def find_valid_addon_description_files ( root_dir ):
     """Scan addon directory to find all addon description files."""
     log ( 1, "Gathering list of valid addons" )
     addon_descriptions = []
-    for directory in os.listdir ( root_dir  ):
-        description = os.path.join ( root_dir, directory, (directory + ".txt") )
+    for directory in listdir ( root_dir  ):
+        description = join ( root_dir, directory, f"{directory}.txt" )
         log ( 3, description, False )
         if exists ( description ):
             addon_descriptions.append ( description )
@@ -37,10 +37,11 @@ def find_valid_addon_description_files ( root_dir ):
 
 def parse_addon_description ( description_file ):
     """Read one addon description file and compile the addon information in a dict. """
-    log ( 2, "parsing addon info for " +  description_file )
-    addon_data = {}
-    addon_data [ "name" ] = Path ( description_file ).stem
-    addon_data [ "Title" ] = Path ( description_file ).stem
+    log ( 2, f"parsing addon info for {description_file}" )
+    addon_data = {
+        "name": Path ( description_file ).stem,
+        "Title": Path ( description_file ).stem,
+    }
     with open( description_file, encoding=None ) as file:
         lines = file.readlines()
     for line in lines:
@@ -63,7 +64,7 @@ def is_library ( addon_data ):
     if name.startswith ( "lib" ):
         result = True
     if result:
-        log ( 3, addon_data [ "name" ] + " is a library" )
+        log ( 3, f"{addon_data [ "name" ]} is a library" )
     return result
 
 def read_addon_info_files ( description_files ):
@@ -72,18 +73,14 @@ def read_addon_info_files ( description_files ):
     addon_info = {}
     for description_file in description_files:
         addon_data  = parse_addon_description ( description_file )
-        addon_data [ "usedBy" ] = {
+        usedby_uses_value = {
             "mandatory": {},
             "optional": {},
             "mandatoryMissing": {},
             "optionalMissing": {}
         }
-        addon_data [ "uses" ] = {
-            "mandatory": {},
-            "optional": {},
-            "mandatoryMissing": {},
-            "optionalMissing": {}
-        }
+        addon_data [ "usedBy" ] = usedby_uses_value
+        addon_data [ "uses" ] = usedby_uses_value
         addon_data [ "markedAsLibrary"] = is_library ( addon_data )
         addon_name = addon_data [ "name" ]
         addon_info [ addon_name ] = addon_data
@@ -94,21 +91,12 @@ def parse_dependency_string ( dep_string ):
     """Interpret a  list of dependencies including version information and return a dict."""
     dependency_info = {}
     dependencies = dep_string.split(" ")
-    for dependency in dependencies:
-        lower_than = ""
-        greater_than = ""
-        if ">=" in dependency:
-            data = dependency.split ( ">=" )
-            greater_than = data [1]
-            dependency = data [0]
-        if "<=" in dependency:
-            data = dependency.split ( "<=" )
-            lower_than = data [1]
-            dependency = data [0]
+    for dependency in dependencies:        
+        data = dependency.split(">=") if ">=" in dependency else dependency.split("<=")        
         dependency_info [ dependency ] = {
-            "name": dependency,
-            "greater_than": greater_than,
-            "lower_than": lower_than
+            "name": data[0],
+            "greater_than": data[1] if ">=" in dependency else "",
+            "lower_than": data[1] if "<=" in dependency else ""
         }
     return dependency_info
 
@@ -118,9 +106,8 @@ def build_dependency_matrix ( addons ):
     for name in addons:
         log ( 3, name)
         if "DependsOn" in addons [ name ]:
-            mandatory_string = addons [ name ] [ "DependsOn" ]
-            mandatory = parse_dependency_string ( mandatory_string )
-            for lib, spec in mandatory.items():
+            mandatory = parse_dependency_string ( addons [ name ] [ "DependsOn" ] )
+            for lib, spec in mandatory.items(): # pylint: disable=unused-variable
                 if lib in addons:
                     # add entry to addon uses
                     addons [name]["uses"]["mandatory"][lib] = mandatory [lib]
@@ -130,8 +117,7 @@ def build_dependency_matrix ( addons ):
                     # add entry to addon uses
                     addons [name]["uses"]["mandatoryMissing"][lib] = mandatory [lib]
         if "OptionalDependsOn" in addons [ name ]:
-            optional_string = addons [ name ] [ "OptionalDependsOn" ]
-            optional  = parse_dependency_string ( optional_string )
+            optional  = parse_dependency_string ( addons [ name ] [ "OptionalDependsOn" ] )
             for lib, spec in optional.items():
                 if lib in addons:
                     # add entry to addon uses
@@ -219,10 +205,12 @@ def print_complications ( addons ):
     )
     print()
 
-file_list = find_valid_addon_description_files ( ADDON_ROOT )
-addonInfo = read_addon_info_files ( file_list )
+def main():
+    file_list = find_valid_addon_description_files ( ADDON_ROOT )
+    addonInfo = read_addon_info_files ( file_list )
+    build_dependency_matrix ( addonInfo )
+    print_dependency_matrix ( addonInfo )
+    print_complications ( addonInfo )
 
-build_dependency_matrix ( addonInfo )
-
-print_dependency_matrix ( addonInfo )
-print_complications ( addonInfo )
+if __name__ == "__main__":
+    main()
