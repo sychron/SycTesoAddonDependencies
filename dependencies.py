@@ -18,7 +18,8 @@ from classes.dependency_matrix import DependencyMatrix
 VERBOSITY = 5
 
 
-ADDON_ROOT = join ( "..", "live", "Addons" )
+#ADDON_ROOT = join ( "..", "live", "Addons" )
+ADDON_ROOT = "C:\\Users\\sychr\\Documents\\Elder Scrolls Online\\live\\Addons"
 
 
 

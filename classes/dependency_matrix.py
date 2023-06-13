@@ -39,7 +39,10 @@ class DependencyMatrix:
         # dependencies carry a mandatory flag to determine type later.
 
         # at this point in the recursion, the addon_name is valid.
-        dependencies = self.addon_list[addon_name].get_combined_dependencies()
+        dependencies = {
+            'mandatory': self.addon_list[addon_name].get_depends_on(),
+            'optional':  self.addon_list[addon_name].get_optional_depends_on()
+        }
 
         # check if maximum depth is reached
         print ( f"DEPTH: {depth}   Addon: {addon_name}" )
@@ -47,20 +50,34 @@ class DependencyMatrix:
             print ( "scan depth reached." )
             return dependencies
 
-        if 0 == len ( dependencies ):
-            print ( "no further dependencies." )
-            return dependencies
+        if 0 == len ( dependencies['mandatory'] ):
+            print ( "no further mandatory dependencies." )
+        else:
+            for dependency in dependencies['mandatory']:
+                # check if current addon exists.
+                # id not, just return an empty list.
+                # missing dependencies are checked for later.
+                addon_name = dependency.get_name()
+                if addon_name in self.addon_list:
+                    result = self.recursive_gathering ( addon_name, depth - 1)
+                    dependencies['mandatory'].extend(result['mandatory'])
+                    dependencies['optional'].extend(result['optional'])
 
-        # if not: extend list for every dependency listed
-        for dependency in dependencies:
-            # check if current addon exists.
-            # id not, just return an empty list.
-            # missing dependencies are checked for later.
-            addon_name = dependency.get_name()
-            if addon_name in self.addon_list:
-                dependencies.extend(
-                    self.recursive_gathering ( addon_name, depth - 1)
-                )
+        if 0 == len ( dependencies['optional'] ):
+            print ( "no further optional dependencies." )
+        else:
+            for dependency in dependencies['optional']:
+                # check if current addon exists.
+                # id not, just return an empty list.
+                # missing dependencies are checked for later.
+                addon_name = dependency.get_name()
+                if addon_name in self.addon_list:
+                    result = self.recursive_gathering ( addon_name, depth - 1)
+                    # important: we are recursing checking optional dependencies here
+                    # so any mandatory dependency returned must still be listed optional
+                    dependencies['optional'].extend(result['mandatory'])
+                    dependencies['optional'].extend(result['optional'])
+
         return dependencies
 
 
@@ -69,7 +86,6 @@ class DependencyMatrix:
            using the dependency_weight method to sort out dublicates
         """
         dependencies = []
-
         for dep in gathered_list:
             # check whether already present
             if dep in dependencies:
@@ -95,10 +111,18 @@ class DependencyMatrix:
         #     print ( addon_name )
         #     dependencies = self.recursive_gathering ( addon_name, scan_depth )
         dependencies = self.recursive_gathering ( "AAQ", scan_depth )
-        dependencies.sort()
-        print ( "All found:" )
-        print ( repr ( dependencies ) )
 
-        dependencies = self.reduce_dependencies ( dependencies )
-        print ( "Reduced to:" )
-        print ( repr ( dependencies ) )
+        print ( "Mandatory found:" )
+        dependencies['mandatory'].sort()
+        print ( repr ( dependencies['mandatory'] ) )
+        dependencies['mandatory'] = self.reduce_dependencies ( dependencies['mandatory'] )
+        print ( "Mandatory reduced to:" )
+        print ( repr ( dependencies['mandatory'] ) )
+
+
+        print ( "Optional found:" )
+        dependencies['optional'].sort()
+        print ( repr ( dependencies['optional'] ) )
+        dependencies['optional'] = self.reduce_dependencies ( dependencies['optional'] )
+        print ( "Optional reduced to:" )
+        print ( repr ( dependencies['optional'] ) )

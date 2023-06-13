@@ -27,16 +27,19 @@ This code was written and testes on Windows. I used python functions for all OS 
 
 CURRENT STATUS
 
-Currently the code is not operational as I'm refactoring. 
+Currently the code is not operational as I'm refactoring.
 
-Refactoring goals are: 
+Refactoring goals part 1 are:
 - get a more robust and maintainable parser (done)
 - get a better model class based data structure to handle more complex comparisons (done)
-- handle dependency versions in parsing (done) 
+- handle dependency versions in parsing (done)
 - handle version requirement differences in nested dependencies (done)
-- handle nested mandatory dependencies of optional dependencies correctly (in progress)
+- handle nested mandatory dependencies of optional dependencies correctly (done)
 
-As soon as these goals are reached, the reporting is adapted to the new data structures.
+Refactoring goals part 2 are:
+- report unsatisfied mandatory dependencies
+- report unused optional dependencies
+- report unused libraries
 
 IDEAS?
 
