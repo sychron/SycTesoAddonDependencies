@@ -13,7 +13,7 @@ Documents
 || SycTesoAddonDependencies
 ||| dependencies.py
 
-when running the script, it will change the plugin text description files for all addons in the live/addons folder and print information about what libraries are used by which plugin, divided between mandatory and optional libraries.
+when running the script, it will scan the plugin text description files for all addons in the live/addons folder and compile information about what libraries are used by which plugin, divided between mandatory and optional libraries.
 
 the script will also compile a list of all addons with missing mandatory or missing optional dependencies, as well as a list of all files assumed to be a library which are not used at all and can possibly be uninstalled.
 
@@ -25,15 +25,23 @@ COMPATIBILITY
 
 This code was written and testes on Windows. I used python functions for all OS relevant differences, such as path processing, so the code should run on other operating systems as well. You might have to change the addon search path in the first lines of the script.
 
-TODO
+CURRENT STATUS
 
-* add support for version checking. Version dependencies are recognized and listed, but versions are not checked when generating the output
-* add support for nested dependencies, f.e. dependencies having dependencies as well. This will only work with addons installed, as this script is not intended to pull addon descriptions from any server.
+Currently the code is not operational as I'm refactoring. 
+
+Refactoring goals are: 
+- get a more robust and maintainable parser (done)
+- get a better model class based data structure to handle more complex comparisons (done)
+- handle dependency versions in parsing (done) 
+- handle version requirement differences in nested dependencies (done)
+- handle nested mandatory dependencies of optional dependencies correctly (in progress)
+
+As soon as these goals are reached, the reporting is adapted to the new data structures.
 
 IDEAS?
 
 If this script is useful to you and/or you have any suggestion, please leave a comment or feel free to contribute.
 
-I know this is not the prettiest python code, but I decided to upload it now instead of having it sit on my disk for months waiting to be made pretty for release.
+I know this may not be the prettiest python code, but I decided to upload it now instead of having it sit on my disk for months waiting to be made pretty for release.
 
 The code is modular, so I hope you can easily navigate it and modify functions or just copy functions you might find useful for your own projects. This script is MIT licensed, so feel free :)
