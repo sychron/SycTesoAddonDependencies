@@ -1,0 +1,34 @@
+Build Dependency Matrix
+================================================
+two dimensional "map/reduce" for dependencies
+- gather dependencies recursively ✔
+- handle mandatory and optional dependencies separately
+- just concat dependency arrys on the way up:
+-- mandatory dependencies:
+--- concat all mandatory dependencies of lower levels
+-- optional dependencies:
+--- merge all optional dependencies of lowerlevel
+--- merge all mandatory dependencies of lower level!       <---- this is the important part
+
+- after gathering, reduce both dependency arrays keeping the higher precedence version information
+-- keep higher min version
+-- keep lower max version
+-- handle conflicts ( min version < max version)           <---- tricky ...
+
+- do a sanity check:
+-- check whether mandatory dependencies conflict optional dependencies
+--- eg mandatory min version < optional max version
+--- handle conflicts                                       <---- tricky ...
+
+- save mandatiory and optional dependencies to matrix entry
+- perform for every addon in list
+
+Check Dependency satisfaction
+================================================
+- Traverse all entries of dependency matrix
+-- traverse all dependencies of entry
+--- check whether required addon is present
+--- check whether required addon has correct version
+--- mark entry as either satisfied or not satisfied
+--- if possible, store a human readable comment to use later
+
